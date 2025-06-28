@@ -3,83 +3,97 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IA Horus - Painel de Análise</title>
   <style>
-    body {
-      background-color: #121212;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 30px;
-    }
-    h1 {
-      color: cyan;
-    }
-    .placar {
-      margin-top: 20px;
-      font-size: 1.2rem;
-    }
-    .seta {
-      font-size: 50px;
-    }
-    .call {
-      color: lime;
-    }
-    .put {
-      color: red;
-    }
+    body { background: #111; color: #fff; font-family: sans-serif; text-align: center; }
+    h1 { color: #00eaff; }
+    .box { margin-top: 30px; }
+    .arrow { font-size: 48px; }
+    .arrow.call { color: #00ff00; }
+    .arrow.put { color: #ff3333; }
+    .placar { background: #222; padding: 10px; border-radius: 8px; margin-top: 20px; }
+    button { padding: 10px 20px; margin: 10px; font-weight: bold; }
   </style>
 </head>
 <body>
   <h1>📉 IA Horus - Painel de Análise</h1>
-  <p id="status">Painel carregado com sucesso!</p>
-  <div>
-    <label>Selecionar par de moeda:</label>
-    <select id="par">
+
+  <div class="box">
+    <label>Par de moedas:</label>
+    <select id="pairSelect">
       <option>EUR/USD</option>
-      <option>USD/JPY</option>
       <option>GBP/USD</option>
-      <option>USD/CAD</option>
-      <option>USD/CHF</option>
+      <option>USD/JPY</option>
+      <option>AUD/CAD</option>
+      <option>USD/INR</option>
+      <option>NZD/JPY</option>
     </select>
-  </div>
-  <div>
-    <label>Tempo do candle:</label>
-    <select id="tempo">
-      <option>1m</option>
-      <option>5m</option>
-      <option>15m</option>
+
+    <br />
+    <label>Timeframe:</label>
+    <select id="timeframeSelect">
+      <option value="1m">1 Minuto</option>
+      <option value="5m">5 Minutos</option>
+      <option value="15m">15 Minutos</option>
     </select>
+
+    <div>
+      <button onclick="modoAnalise('auto')">Análise Automática</button>
+      <button onclick="modoAnalise('manual')">Análise Manual</button>
+    </div>
+
+    <div id="status" style="margin: 20px;"></div>
+
+    <div id="alertaEntrada" class="arrow" style="display:none;"></div>
+    <div id="nomeEntrada" style="font-weight: bold;"></div>
+
+    <div class="placar" id="placar">
+      ✅ Vitórias: <span id="wins">0</span> |
+      ❌ Derrotas: <span id="losses">0</span>
+    </div>
   </div>
-  <div style="margin-top:20px;">
-    <button onclick="startAnalise()">Análise Automática</button>
-    <button onclick="alert('Modo Manual ainda em desenvolvimento')">Análise Manual</button>
-  </div>
-  <div id="sinal" class="seta"></div>
-  <div class="placar" id="placar">✅ Vitórias: 0 | ❌ Derrotas: 0</div>
 
   <script>
-    let vitoria = 0;
-    let derrota = 0;
-    function startAnalise() {
-      document.getElementById("status").textContent = "Analisando...";
+    let wins = 0, losses = 0;
+
+    function modoAnalise(tipo) {
+      document.getElementById("status").innerText = "🔍 Analisando (" + tipo + ")...";
       setTimeout(() => {
-        const direcao = Math.random() > 0.5 ? 'CALL' : 'PUT';
-        const cor = direcao === 'CALL' ? 'call' : 'put';
-        document.getElementById("sinal").innerHTML = 
-          `<div class="${cor}">⇧⇩<br>${direcao} AGORA</div>`;
-        document.getElementById("status").textContent = "Entrada confirmada!";
+        const entrada = Math.random() > 0.5 ? "CALL" : "PUT";
+        exibirAlerta(entrada);
+        document.getElementById("status").innerText = "⏳ Entrada em 10 segundos...";
+
         setTimeout(() => {
-          const win = Math.random() > 0.5;
-          if (win) vitoria++;
-          else derrota++;
-          document.getElementById("placar").textContent = 
-            `✅ Vitórias: ${vitoria} | ❌ Derrotas: ${derrota}`;
-          document.getElementById("status").textContent = "Aguardando nova análise...";
-          document.getElementById("sinal").innerHTML = "";
-        }, 60000);
-      }, 10000);
+          document.getElementById("status").innerText = "🎯 Entrada confirmada: " + entrada;
+          // Simular resultado
+          const resultado = Math.random() > 0.4;
+          if (resultado) {
+            wins++;
+            document.getElementById("wins").innerText = wins;
+          } else {
+            losses++;
+            document.getElementById("losses").innerText = losses;
+          }
+          ocultarAlerta();
+        }, 10000);
+      }, 2000);
+    }
+
+    function exibirAlerta(tipo) {
+      const seta = document.getElementById("alertaEntrada");
+      seta.style.display = "block";
+      seta.className = "arrow " + (tipo === "CALL" ? "call" : "put");
+      seta.innerText = tipo === "CALL" ? "↑" : "↓";
+      document.getElementById("nomeEntrada").innerText = tipo === "CALL" ? "CALL AGORA" : "PUT AGORA";
+    }
+
+    function ocultarAlerta() {
+      setTimeout(() => {
+        document.getElementById("alertaEntrada").style.display = "none";
+        document.getElementById("nomeEntrada").innerText = "";
+        document.getElementById("status").innerText = "";
+      }, 15000);
     }
   </script>
 </body>
