@@ -1,28 +1,86 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IA Horus - Painel Trading</title>
+  <title>IA Horus - Painel de Análise</title>
   <style>
     body {
-      background: #121212;
-      color: white;
+      background-color: #121212;
+      color: #fff;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px;
+      padding: 30px;
     }
     h1 {
-      color: #00e0ff;
+      color: cyan;
     }
-    .status {
-      font-size: 24px;
-      margin: 20px 0;
+    .placar {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+    .seta {
+      font-size: 50px;
+    }
+    .call {
+      color: lime;
+    }
+    .put {
+      color: red;
     }
   </style>
 </head>
 <body>
-  <h1>📈 IA Horus - Painel de Análise</h1>
-  <div class="status">Painel carregado com sucesso!</div>
+  <h1>📉 IA Horus - Painel de Análise</h1>
+  <p id="status">Painel carregado com sucesso!</p>
+  <div>
+    <label>Selecionar par de moeda:</label>
+    <select id="par">
+      <option>EUR/USD</option>
+      <option>USD/JPY</option>
+      <option>GBP/USD</option>
+      <option>USD/CAD</option>
+      <option>USD/CHF</option>
+    </select>
+  </div>
+  <div>
+    <label>Tempo do candle:</label>
+    <select id="tempo">
+      <option>1m</option>
+      <option>5m</option>
+      <option>15m</option>
+    </select>
+  </div>
+  <div style="margin-top:20px;">
+    <button onclick="startAnalise()">Análise Automática</button>
+    <button onclick="alert('Modo Manual ainda em desenvolvimento')">Análise Manual</button>
+  </div>
+  <div id="sinal" class="seta"></div>
+  <div class="placar" id="placar">✅ Vitórias: 0 | ❌ Derrotas: 0</div>
+
+  <script>
+    let vitoria = 0;
+    let derrota = 0;
+    function startAnalise() {
+      document.getElementById("status").textContent = "Analisando...";
+      setTimeout(() => {
+        const direcao = Math.random() > 0.5 ? 'CALL' : 'PUT';
+        const cor = direcao === 'CALL' ? 'call' : 'put';
+        document.getElementById("sinal").innerHTML = 
+          `<div class="${cor}">⇧⇩<br>${direcao} AGORA</div>`;
+        document.getElementById("status").textContent = "Entrada confirmada!";
+        setTimeout(() => {
+          const win = Math.random() > 0.5;
+          if (win) vitoria++;
+          else derrota++;
+          document.getElementById("placar").textContent = 
+            `✅ Vitórias: ${vitoria} | ❌ Derrotas: ${derrota}`;
+          document.getElementById("status").textContent = "Aguardando nova análise...";
+          document.getElementById("sinal").innerHTML = "";
+        }, 60000);
+      }, 10000);
+    }
+  </script>
 </body>
 </html>
