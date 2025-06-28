@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IA Horus - Painel de Análise</title>
+  <title>IA Sinal - Painel de Análise</title>
   <style>
     body {
       margin: 0;
@@ -23,13 +24,19 @@
     .controls {
       margin-top: 15px;
     }
-    select, button {
+    select, .btn {
       padding: 10px;
       margin: 5px;
       background: #1f1f1f;
       color: white;
       border: none;
       border-radius: 5px;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #00eaff;
+      color: black;
+      font-weight: bold;
     }
     .grafico {
       margin: 20px auto;
@@ -53,43 +60,85 @@
       margin: 20px auto;
       width: fit-content;
     }
+    .btn-salvar {
+      margin-top: 15px;
+      background: #005eff;
+    }
+    .painel-botoes {
+      margin-top: 20px;
+    }
+    .botao-estilo {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 20px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+    .manual {
+      background-color: #00c3ff;
+    }
+    .automatico {
+      background-color: #00ff66;
+    }
+    .botao-win, .botao-loss {
+      display: inline-block;
+      padding: 8px 16px;
+      margin: 5px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+    .botao-win {
+      background-color: #00ff00;
+      color: black;
+    }
+    .botao-loss {
+      background-color: #ff4d4d;
+      color: white;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>📊 IA Horus - Painel de Análise</h1>
+    <h1>📊 IA SINAL - Painel de Análise Técnica</h1>
     <div class="controls">
       <label>Par:</label>
-      <select id="par">
-        <option>EUR/USD</option>
-        <option>USD/JPY</option>
-        <option>GBP/USD</option>
-        <option>AUD/CAD</option>
-        <option>NZD/JPY</option>
+      <select id="par" onchange="atualizarGrafico()">
+        <option value="FX:EURUSD">EUR/USD</option>
+        <option value="FX:USDJPY">USD/JPY</option>
+        <option value="FX:GBPUSD">GBP/USD</option>
+        <option value="FX:AUDCAD">AUD/CAD</option>
+        <option value="FX:NZDJPY">NZD/JPY</option>
       </select>
       <label>Tempo:</label>
-      <select id="tempo">
-        <option>1m</option>
-        <option>5m</option>
-        <option>15m</option>
+      <select id="tempo" onchange="atualizarGrafico()">
+        <option value="1">1m</option>
+        <option value="5">5m</option>
+        <option value="15">15m</option>
       </select>
-      <button onclick="analise('auto')">Análise Automática</button>
-      <button onclick="analise('manual')">Análise Manual</button>
+      <button class="btn btn-salvar" onclick="salvarPreferencias()">💾 Salvar Par/Tempo</button>
+    </div>
+    <div class="painel-botoes">
+      <div class="botao-estilo manual" onclick="analise('manual')">🔍 Análise Manual</div>
+      <div class="botao-estilo automatico" onclick="analise('auto')">⚙️ Modo Automático: ON</div>
     </div>
   </header>
 
   <div class="grafico">
-    <iframe src="https://s.tradingview.com/embed-widget/mini-symbol-overview/?symbol=FX:EURUSD&width=100%&height=300&locale=br&dateRange=1D&colorTheme=dark&trendLineColor=rgba(0,255,0,1)&underLineColor=rgba(0,255,0,0.3)&isTransparent=false&autosize=true" 
-      frameborder="0" allowtransparency="true" scrolling="no" style="width: 100%; height: 300px;"></iframe>
+    <iframe id="graficoFrame" src="" width="100%" height="400" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
   </div>
 
   <div id="alerta" class="seta"></div>
   <div class="placar">
-    ✅ Vitórias: <span id="wins">0</span> | ❌ Derrotas: <span id="losses">0</span>
+    ✅ WIN: <span id="wins">0</span> | ❌ LOSS: <span id="losses">0</span><br>
+    <span class="botao-win">✅ WIN</span>
+    <span class="botao-loss">❌ LOSS</span>
   </div>
 
   <script>
     let wins = 0, losses = 0;
+
     function analise(tipo) {
       const alerta = document.getElementById("alerta");
       alerta.textContent = "⏳ Sinal em 10 segundos...";
@@ -112,6 +161,31 @@
         }, 60000);
       }, 10000);
     }
+
+    function atualizarGrafico() {
+      const par = document.getElementById("par").value;
+      const tempo = document.getElementById("tempo").value;
+      const iframe = document.getElementById("graficoFrame");
+      iframe.src = `https://s.tradingview.com/widgetembed/?frameElementId=tradingview_abcdef&symbol=${par}&interval=${tempo}&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&theme=dark&style=1&timezone=Etc/UTC&withdateranges=1&hidevolume=1&hideideas=1&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=br`;
+    }
+
+    function salvarPreferencias() {
+      const par = document.getElementById("par").value;
+      const tempo = document.getElementById("tempo").value;
+      localStorage.setItem("parSelecionado", par);
+      localStorage.setItem("tempoSelecionado", tempo);
+      alert("Preferências salvas!");
+    }
+
+    function carregarPreferencias() {
+      const parSalvo = localStorage.getItem("parSelecionado");
+      const tempoSalvo = localStorage.getItem("tempoSelecionado");
+      if (parSalvo) document.getElementById("par").value = parSalvo;
+      if (tempoSalvo) document.getElementById("tempo").value = tempoSalvo;
+      atualizarGrafico();
+    }
+
+    window.onload = carregarPreferencias;
   </script>
 </body>
 </html>
