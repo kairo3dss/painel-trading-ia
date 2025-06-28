@@ -1,13 +1,117 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel IA Horus</title>
-  <meta http-equiv="refresh" content="0; url=https://kairo3dss.github.io/painel-trading-ia/" />
+  <title>IA Horus - Painel de Análise</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #0d0d0d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    header {
+      background-color: #121212;
+      padding: 20px;
+    }
+    h1 {
+      margin: 0;
+      color: #00eaff;
+    }
+    .controls {
+      margin-top: 15px;
+    }
+    select, button {
+      padding: 10px;
+      margin: 5px;
+      background: #1f1f1f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    .grafico {
+      margin: 20px auto;
+      max-width: 100%;
+    }
+    .seta {
+      font-size: 2em;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .verde {
+      color: #00ff00;
+    }
+    .vermelha {
+      color: red;
+    }
+    .placar {
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 20px auto;
+      width: fit-content;
+    }
+  </style>
 </head>
-<body style="background-color: black; color: white; text-align: center;">
-  <p>Redirecionando para o painel em https://kairo3dss.github.io/painel-trading-ia/</p>
+<body>
+  <header>
+    <h1>📊 IA Horus - Painel de Análise</h1>
+    <div class="controls">
+      <label>Par:</label>
+      <select id="par">
+        <option>EUR/USD</option>
+        <option>USD/JPY</option>
+        <option>GBP/USD</option>
+        <option>AUD/CAD</option>
+        <option>NZD/JPY</option>
+      </select>
+      <label>Tempo:</label>
+      <select id="tempo">
+        <option>1m</option>
+        <option>5m</option>
+        <option>15m</option>
+      </select>
+      <button onclick="analise('auto')">Análise Automática</button>
+      <button onclick="analise('manual')">Análise Manual</button>
+    </div>
+  </header>
+
+  <div class="grafico">
+    <iframe src="https://s.tradingview.com/embed-widget/mini-symbol-overview/?symbol=FX:EURUSD&width=100%&height=300&locale=br&dateRange=1D&colorTheme=dark&trendLineColor=rgba(0,255,0,1)&underLineColor=rgba(0,255,0,0.3)&isTransparent=false&autosize=true" 
+      frameborder="0" allowtransparency="true" scrolling="no" style="width: 100%; height: 300px;"></iframe>
+  </div>
+
+  <div id="alerta" class="seta"></div>
+  <div class="placar">
+    ✅ Vitórias: <span id="wins">0</span> | ❌ Derrotas: <span id="losses">0</span>
+  </div>
+
+  <script>
+    let wins = 0, losses = 0;
+    function analise(tipo) {
+      const alerta = document.getElementById("alerta");
+      alerta.textContent = "⏳ Sinal em 10 segundos...";
+
+      setTimeout(() => {
+        const call = Math.random() > 0.5;
+        alerta.textContent = call ? "↑ CALL AGORA" : "↓ PUT AGORA";
+        alerta.className = call ? "seta verde" : "seta vermelha";
+
+        setTimeout(() => {
+          if (Math.random() > 0.5) {
+            wins++;
+            document.getElementById("wins").textContent = wins;
+          } else {
+            losses++;
+            document.getElementById("losses").textContent = losses;
+          }
+          alerta.textContent = "⏳ Aguardando próximo sinal...";
+          alerta.className = "seta";
+        }, 60000);
+      }, 10000);
+    }
+  </script>
 </body>
 </html>
